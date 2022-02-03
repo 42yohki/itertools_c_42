@@ -25,7 +25,7 @@ void	filter_del(void *iter)
 	free(iter);
 }
 
-t_filter_iter	*filter_iter(void *iter, t_filter filter)
+t_filter_iter	*filter(void *iter, t_filter filter)
 {
 	t_filter_iter	*filter_iter;
 

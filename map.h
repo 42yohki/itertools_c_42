@@ -22,7 +22,7 @@ typedef struct s_new_map_iter
 	t_del_elem	del_elem;
 }	t_new_map_iter;
 
-t_map_iter		*map_iter(void *iter, t_map map);
-t_new_map_iter	*new_map_iter(void *iter, t_new_map new_map, t_del_elem del_elem);
+t_map_iter		*map(void *iter, t_map map);
+t_new_map_iter	*new_map(void *iter, t_new_map new_map, t_del_elem del_elem);
 
 #endif

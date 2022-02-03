@@ -58,11 +58,11 @@ void	example1(void)
 {
 	printf("[Example 1]\n");
 	foreach(
-		map_iter(
-			new_map_iter(
-				filter_iter(
-					filter_iter(
-						range_iter(0, 100),
+		map(
+			new_map(
+				filter(
+					filter(
+						range(0, 100),
 						is_x2),
 					is_x3),
 				map_cpy,
@@ -77,9 +77,9 @@ void	example2(void)
 	int		sum;
 
 	printf("[Example 2]\n");
-	darr = reduce_iter(
-		new_map_iter(
-			range_iter(0, 100),
+	darr = reduce(
+		new_map(
+			range(0, 100),
 			map_cpy,
 			NULL),
 		collect_darr,
@@ -88,7 +88,7 @@ void	example2(void)
 	if (!darr)
 		return ;
 	sum = 0;
-	reduce_iter(
+	reduce(
 		get_darr_iter(darr),
 		sum_int,
 		&sum,

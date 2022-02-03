@@ -13,6 +13,6 @@ typedef struct s_filter_iter
 	t_filter	filter;
 }	t_filter_iter;
 
-t_filter_iter	*filter_iter(void *iter, t_filter filter);
+t_filter_iter	*filter(void *iter, t_filter filter);
 
 #endif

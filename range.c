@@ -28,7 +28,7 @@ void	range_del(void *iter)
 	free(iter);
 }
 
-t_range_iter	*range_iter(int start, int end)
+t_range_iter	*range(int start, int end)
 {
 	t_range_iter	*range_iter;
 
