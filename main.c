@@ -77,11 +77,22 @@ void	example2(void)
 	int		sum;
 
 	printf("[Example 2]\n");
-	darr = reduce_iter(new_map_iter(range_iter(0, 100), map_cpy, NULL), collect_darr, darr_new(0, free));
+	darr = reduce_iter(
+		new_map_iter(
+			range_iter(0, 100),
+			map_cpy,
+			NULL),
+		collect_darr,
+		darr_new(0, free),
+		(t_del_sum)darr_del);
 	if (!darr)
 		return ;
 	sum = 0;
-	reduce_iter(get_darr_iter(darr), sum_int, &sum);
+	reduce_iter(
+		get_darr_iter(darr),
+		sum_int,
+		&sum,
+		NULL);
 	printf("sum = %d\n", sum);
 	darr_del(darr);
 }
