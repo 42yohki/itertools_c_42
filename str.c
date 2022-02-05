@@ -68,3 +68,8 @@ bool	str_add(t_str *str, char c)
 	str->_len++;
 	return (true);
 }
+
+char	*str_c_str(t_str *str)
+{
+	return (strdup(str->_str));
+}
