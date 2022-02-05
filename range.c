@@ -8,18 +8,21 @@ t_elem	range_next(t_range_iter *iter)
 {
 	t_elem	elem;
 
-	elem.del_elem = NULL;
+	elem.del_elem = free;
 	if (iter->i < iter->end)
 	{
-		elem.data = &iter->i;
-		elem.it_stat = it_ok;
-		iter->i++;
+		elem.data = malloc(sizeof(int));
+		if (elem.data == NULL)
+			elem.it_stat = it_err;
+		else
+		{
+			*(int *)elem.data = iter->i;
+			iter->i++;
+			elem.it_stat = it_ok;
+		}
 	}
 	else
-	{
-		elem.data = NULL;
 		elem.it_stat = it_end;
-	}
 	return (elem);
 }
 
@@ -38,7 +41,7 @@ t_range_iter	*range(int start, int end)
 	range_iter->base_iter.next = range_next;
 	range_iter->base_iter.del_iter = range_del;
 	range_iter->start = start;
-	range_iter->end = end - 1;
-	range_iter->i = start - 1;
+	range_iter->end = end;
+	range_iter->i = start;
 	return (range_iter);
 }
