@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "iter.h"
 #include "elem.h"
 #include "foreach.h"
@@ -10,6 +11,7 @@
 #include "range.h"
 #include "darr.h"
 #include "darr_iter.h"
+#include "get_next_line.h"
 
 // filter
 bool	is_x2(void *i)
@@ -24,21 +26,15 @@ bool	is_x3(void *i)
 }
 
 // map
-void	map_x2(void *i)
+void	*to_x2(void *i)
 {
-	*(int *)i *= 2;
-}
+	int	*j;
 
-// new_map
-void	*map_cpy(void *i)
-{
-	int	*new_i;
-
-	new_i = malloc(sizeof(int));
-	if (!new_i)
+	j = malloc(sizeof(int));
+	if (!j)
 		return (NULL);
-	*new_i = *(int *)i;
-	return (new_i);
+	*j = *(int *)i * 2;
+	return (j);
 }
 
 // callback
@@ -48,58 +44,65 @@ void	print_int(void *i)
 }
 
 // reduce
-void	*sum_int(void *prev, void *curr)
+void	*add(void *a, void *b)
 {
-	*(int *)prev += *(int *)curr;
-	return (prev);
+	int	*sum;
+
+	sum = malloc(sizeof(int));
+	if (sum)
+		*sum = *(int *)a + *(int *)b;
+	return (sum);
 }
 
 void	example1(void)
 {
+	void	*it;
+
 	printf("[Example 1]\n");
-	foreach(
-		map(
-			new_map(
-				filter(
-					filter(
-						range(0, 100),
-						is_x2),
-					is_x3),
-				map_cpy,
-				free),
-			map_x2),
-		print_int);
+	foreach(({
+			it = range(0, 100);
+			it = filter(it, is_x2);
+			it = filter(it, is_x3);
+			it = map(it, to_x2, free);
+		}), print_int);
 }
 
 void	example2(void)
 {
 	t_darr	*darr;
-	int		sum;
+	int		*sum;
 
 	printf("[Example 2]\n");
-	darr = reduce(
-		new_map(
-			range(0, 100),
-			map_cpy,
-			NULL),
-		collect_darr,
-		darr_new(0, free),
-		(t_del_sum)darr_del);
+	darr = darr_collect(range(0, 100));
 	if (!darr)
 		return ;
-	sum = 0;
-	reduce(
-		get_darr_iter(darr),
-		sum_int,
-		&sum,
-		NULL);
-	printf("sum = %d\n", sum);
+	sum = reduce(darr_iter(darr), add, calloc(1, sizeof(int)), free);
+	if (!sum)
+		return ;
+	printf("sum = %d\n", *sum);
 	darr_del(darr);
+	free(sum);
+}
+
+// example3
+void	example3(void)
+{
+	char	*line;
+
+	printf("[Example 3]\n");
+	line = get_next_line(STDIN_FILENO);
+	while (line)
+	{
+		printf("> %s", line);
+		free(line);
+		line = get_next_line(STDIN_FILENO);
+	}
 }
 
 int	main(void)
 {
 	example1();
 	example2();
+	example3();
 	return (0);
 }
