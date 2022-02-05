@@ -6,30 +6,19 @@
 #include "iter.h"
 #include "str.h"
 
+// getc_iter
 t_elem	getc_iter_next(t_getc_iter *iter)
 {
-	t_elem	elem;
-
-	elem.del_elem = NULL;
 	if (iter->pos >= iter->ret)
 	{
 		iter->ret = read(iter->fd, iter->buf, BUFFER_SIZE);
 		if (iter->ret == -1)
-		{
-			elem.it_stat = it_err;
-			return (elem);
-		}
+			return (err_elem());
 		else if (iter->ret == 0)
-		{
-			elem.it_stat = it_end;
-			return (elem);
-		}
+			return (end_elem());
 		iter->pos = 0;
 	}
-	elem.data = &iter->buf[iter->pos];
-	iter->pos++;
-	elem.it_stat = it_ok;
-	return (elem);
+	return (ok_elem(&iter->buf[iter->pos++], NULL));
 }
 
 void	getc_iter_del(void *iter)
@@ -52,57 +41,36 @@ t_getc_iter	*getc_iter(int fd)
 	return (iter);
 }
 
+// gnl_iter
 t_elem	gnl_iter_next(t_gnl_iter *iter)
 {
-	t_elem	elem;
 	t_elem	getc_elem;
 	t_str	*line;
 
-	elem.del_elem = (t_del_elem)str_del;
 	line = str_new();
 	if (!line)
+		return (err_elem());
+	while (next_elem(&getc_elem, iter->getc_iter) == it_ok)
 	{
-		elem.it_stat = it_err;
-		return (elem);
-	}
-	getc_elem = next(iter->getc_iter);
-	if (getc_elem.it_stat == it_end)
-	{
-		str_del(line);
-		elem.it_stat = it_end;
-		return (elem);
-	}
-	while (getc_elem.it_stat == it_ok)
-	{
-		if (*(char *)getc_elem.data == '\n')
-		{
-			if (!str_add(line, *(char *)getc_elem.data))
-			{
-				str_del(line);
-				elem.it_stat = it_err;
-				return (elem);
-			}
-			elem.data = line;
-			elem.it_stat = it_ok;
-			return (elem);
-		}
-		else if (!str_add(line, *(char *)getc_elem.data))
+		if (!str_add(line, *(char *)getc_elem.data))
 		{
 			str_del(line);
-			elem.it_stat = it_err;
-			return (elem);
+			return (err_elem());
 		}
-		getc_elem = next(iter->getc_iter);
+		if (str_get(line, str_len(line) - 1) == '\n')
+			return (ok_elem(line, (t_del_elem)str_del));
 	}
 	if (getc_elem.it_stat == it_end)
 	{
-		elem.data = line;
-		elem.it_stat = it_ok;
-		return (elem);
+		if (str_len(line) == 0)
+		{
+			str_del(line);
+			return (end_elem());
+		}
+		return (ok_elem(line, (t_del_elem)str_del));
 	}
 	str_del(line);
-	elem.it_stat = it_err;
-	return (elem);
+	return (err_elem());
 }
 
 void	gnl_iter_del(void *iter)
@@ -129,12 +97,13 @@ t_gnl_iter	*gnl_iter(int fd)
 	return (iter);
 }
 
+// get_next_line
 char	*get_next_line(int fd)
 {
 	static t_gnl_iter	*iter = NULL;
 	t_elem				elem;
 	t_str				*line;
-	char				*ret;
+	char				*c_str;
 
 	if (!iter)
 	{
@@ -142,15 +111,14 @@ char	*get_next_line(int fd)
 		if (!iter)
 			return (NULL);
 	}
-	elem = next(iter);
-	if (elem.it_stat == it_ok)
+	if (next_elem(&elem, iter) == it_ok)
 	{
 		line = (t_str *)elem.data;
-		ret = strdup(line->_str);
+		c_str = str_c_str(line);
 		str_del(line);
-		if (!ret)
+		if (!c_str)
 			return (NULL);
-		return (ret);
+		return (c_str);
 	}
 	else
 	{
