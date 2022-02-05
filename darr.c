@@ -82,3 +82,8 @@ bool	darr_add(t_darr *darr, void *data)
 	darr->_len++;
 	return (true);
 }
+
+void	darr_set_del(t_darr *darr, void (*del)(void *))
+{
+	darr->_del = del;
+}
