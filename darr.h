@@ -17,5 +17,6 @@ size_t	darr_len(t_darr *darr);
 void	darr_set(t_darr *darr, size_t index, void *data);
 void	*darr_get(t_darr *darr, size_t index);
 bool	darr_add(t_darr *darr, void *data);
+void	darr_set_del(t_darr *darr, void (*del)(void *));
 
 #endif

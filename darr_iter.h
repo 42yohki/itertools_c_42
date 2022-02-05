@@ -11,7 +11,7 @@ typedef struct s_darr_iter
 	size_t		index;
 }	t_darr_iter;
 
-t_darr_iter	*get_darr_iter(t_darr *darr);
-void		*collect_darr(void *prev, void *curr);
+t_darr_iter	*darr_iter(t_darr *darr);
+t_darr		*darr_collect(void *iter);
 
 #endif

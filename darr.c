@@ -76,11 +76,14 @@ bool	darr_resize(t_darr *darr, size_t new_cap)
 
 bool	darr_add(t_darr *darr, void *data)
 {
-	size_t	index;
-
 	if (darr->_len == darr->_cap && !darr_resize(darr, darr->_cap * 2))
 		return (false);
 	darr_set(darr, darr->_len, data);
 	darr->_len++;
 	return (true);
+}
+
+void	darr_set_del(t_darr *darr, void (*del)(void *))
+{
+	darr->_del = del;
 }
