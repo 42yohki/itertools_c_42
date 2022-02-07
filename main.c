@@ -12,6 +12,7 @@
 #include "darr.h"
 #include "darr_iter.h"
 #include "get_next_line.h"
+#include "sort.h"
 
 // filter
 bool	is_x2(void *i)
@@ -54,6 +55,12 @@ void	*add(void *a, void *b)
 	return (sum);
 }
 
+// sort
+int		cmp_int_desc(const void *a, const void *b)
+{
+	return (**(int **)b - **(int **)a);
+}
+
 void	example1(void)
 {
 	void	*it;
@@ -64,6 +71,7 @@ void	example1(void)
 			it = filter(it, is_x2);
 			it = filter(it, is_x3);
 			it = map(it, to_x2, free);
+			it = sort(it, &cmp_int_desc);
 		}), print_int);
 }
 
